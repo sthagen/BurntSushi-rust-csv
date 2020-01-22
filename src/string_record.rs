@@ -331,6 +331,7 @@ impl StringRecord {
     #[inline]
     pub fn get(&self, i: usize) -> Option<&str> {
         self.0.get(i).map(|bytes| {
+            debug_assert!(str::from_utf8(bytes).is_ok());
             // This is safe because we guarantee that all string records
             // have a valid UTF-8 buffer. It's also safe because we
             // individually check each field for valid UTF-8.
@@ -553,6 +554,7 @@ impl StringRecord {
     /// ```
     #[inline]
     pub fn as_slice(&self) -> &str {
+        debug_assert!(str::from_utf8(self.0.as_slice()).is_ok());
         // This is safe because we guarantee that each field is valid UTF-8.
         // If each field is valid UTF-8, then the entire buffer (up to the end
         // of the last field) must also be valid UTF-8.
@@ -616,8 +618,7 @@ impl StringRecord {
         &mut self,
         rdr: &mut Reader<R>,
     ) -> Result<bool> {
-        // SAFETY: Note that despite the absence of `unsafe` in this function,
-        // this code is critical to upholding the safety of other `unsafe`
+        // SAFETY: This code is critical to upholding the safety of other code
         // blocks in this module. Namely, after calling `read_byte_record`,
         // it is possible for `record` to contain invalid UTF-8. We check for
         // this in the `validate` method, and if it does have invalid UTF-8, we
@@ -706,6 +707,7 @@ impl<'r> Iterator for StringRecordIter<'r> {
     #[inline]
     fn next(&mut self) -> Option<&'r str> {
         self.0.next().map(|bytes| {
+            debug_assert!(str::from_utf8(bytes).is_ok());
             // See StringRecord::get for safety argument.
             unsafe { str::from_utf8_unchecked(bytes) }
         })
@@ -726,6 +728,7 @@ impl<'r> DoubleEndedIterator for StringRecordIter<'r> {
     #[inline]
     fn next_back(&mut self) -> Option<&'r str> {
         self.0.next_back().map(|bytes| {
+            debug_assert!(str::from_utf8(bytes).is_ok());
             // See StringRecord::get for safety argument.
             unsafe { str::from_utf8_unchecked(bytes) }
         })

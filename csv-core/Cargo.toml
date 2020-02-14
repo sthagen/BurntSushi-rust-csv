@@ -1,6 +1,6 @@
 [package]
 name = "csv-core"
-version = "0.1.6"  #:version
+version = "0.1.9"  #:version
 authors = ["Andrew Gallant <jamslam@gmail.com>"]
 description = "Bare bones CSV parsing with no_std support."
 documentation = "https://docs.rs/csv-core"
@@ -21,11 +21,11 @@ appveyor = { repository = "BurntSushi/rust-csv" }
 bench = false
 
 [features]
-default = ["libc"]
+default = []
 libc = ["memchr/libc"]
 
 [dependencies]
 memchr = { version = "2", default-features = false }
 
 [dev-dependencies]
-arrayvec = { version = "0.4", default-features = false }
+arrayvec = { version = "0.5", default-features = false }

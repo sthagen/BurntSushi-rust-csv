@@ -335,15 +335,14 @@ macro_rules! deserialize_int {
             visitor: V,
         ) -> Result<V::Value, Self::Error> {
             let field = self.next_field()?;
-            let num =
-                if field.starts_with("0x") {
-                    <$inttype>::from_str_radix(&field[2..], 16)
-                } else {
-                    field.parse()
-                };
+            let num = if field.starts_with("0x") {
+                <$inttype>::from_str_radix(&field[2..], 16)
+            } else {
+                field.parse()
+            };
             visitor.$visit(num.map_err(|err| self.error(DEK::ParseInt(err)))?)
         }
-    }
+    };
 }
 
 impl<'a, 'de: 'a, T: DeRecord<'de>> Deserializer<'de>
@@ -558,7 +557,7 @@ impl<'a, 'de: 'a, T: DeRecord<'de>> Deserializer<'de>
         // Read and drop the next field.
         // This code is reached, e.g., when trying to deserialize a header
         // that doesn't exist in the destination struct.
-        let _ = self.next_field()?;
+        let _ = self.next_field_bytes()?;
         visitor.visit_unit()
     }
 }
